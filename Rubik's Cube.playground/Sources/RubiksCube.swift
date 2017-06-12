@@ -13,7 +13,7 @@ public class RubiksCube {
     public init(area: PlayArea, fake: Bool = false) {
         self.area = area
         area.cube = self
-        
+
         var toAnimate = [SCNNode]()
         // makes colored 27 SCNBox that makes up the cube
         for x in -1...1 {
@@ -110,7 +110,7 @@ public class RubiksCube {
                 }),
                 
                 SCNAction.group([SCNAction.run({ (node) in
-                    if let _ = node.geometry, let _ = replaced.geometry { // just to be safe...
+                    if let _ = node.geometry, let _ = replaced.geometry {
                         node.geometry!.materials = replaced.geometry!.materials
                     }
                 }), SCNAction.fadeIn(duration: 7.0), SCNAction.rotate(toAxisAngle: rot, duration: 7.0), SCNAction.move(to: pos, duration: 7.0), SCNAction.scale(to: 1.0, duration: 7.0)]),
@@ -120,10 +120,12 @@ public class RubiksCube {
                 SCNAction.run({ (node) in
                     self.animating = false
                     self.area.beginingAnimationFinished = true
-                    self.area.view.allowsCameraControl = true
+                    // self.area.view.allowsCameraControl = true
+                        
                     
                     if !self.hasBeenAdded {
                         self.area.pan.delegate = self.area
+                        // add default gestures back after animations end
                         self.area.view.addGestureRecognizer(self.area.pan)
                         for gesture in self.area.defaultGestures {
                             gesture.delegate = self.area
@@ -146,7 +148,7 @@ public class RubiksCube {
         let container = SCNNode()
         
         for node in area.scene.rootNode.childNodes {
-            if let geo = node.geometry, geo is SCNBox && node.position.y >= -2 && (node.position.y.isclose(to: y) || node.presentation.position.y.isclose(to: y)) {
+            if let geo = node.geometry, geo is SCNBox && node.position.y >= -2 && (node.position.y.isclose(to: y)) {
                 container.addChildNode(node)
             }
         }
@@ -179,8 +181,7 @@ public class RubiksCube {
         let container = SCNNode()
         
         for node in area.scene.rootNode.childNodes {
-            if let geo = node.geometry, geo is SCNBox && node.isHidden && node.position.y >= -2 && (node.position.y.isClose(to: yy) || node.presentation.position.y.isClose(to: yy)) {
-                node.removeFromParentNode()
+            if let geo = node.geometry, geo is SCNBox && node.isHidden && node.position.y >= -2 && (node.position.y.isclose(to: yy)) {
                 container.addChildNode(node)
             }
         }
@@ -211,7 +212,6 @@ public class RubiksCube {
         return container
     }
     
-    // scrambles cube randomly 63 times
     func scramble() {
         for _ in 0...20 {
             
@@ -249,7 +249,8 @@ public class RubiksCube {
     func snap(container: SCNNode, vertical: Bool, side: Side, finished: @escaping () -> ()) {
         self.animating = true
         
-        let roundedOffset = Float(Int((abs(area.offset).truncatingRemainder(dividingBy: 360)) / 90.0 + 0.5) * 90) * Float(Double.pi / 180) * (area.offset < 0 ? -1 : 1)
+        let remainder = Int((abs(area.offset).truncatingRemainder(dividingBy: 360)) / 90.0 + 0.5)
+        let roundedOffset = Float(remainder * 90) * Float(Double.pi / 180) * (area.offset < 0 ? -1 : 1)
         
         var rot: SCNVector4!
         
