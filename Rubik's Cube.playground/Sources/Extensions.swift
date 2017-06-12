@@ -6,23 +6,12 @@ public extension Float {
     
     // 5% similiar
     func isClose(to: Float) -> Bool {
-        let per = Float(0.5)
-        let a = self
-        let b = to
-        let absA = abs(a)
-        let absB = abs(b)
-        let diff = abs(a - b)
-        
-        if (a == 0 || b == 0 || diff <  Float.leastNormalMagnitude) {
-            return diff < (per * Float.leastNormalMagnitude)
-        } else {
-            return diff / (absA + absB) < per
-        }
+        return abs(self - to) < 0.05
     }
     
     // is between 5% confidence interval
     func isclose(to: Float) -> Bool {
-        return abs(self - to) < 0.05 || abs(to - self) < 0.05
+        return abs(self - to) < 0.05 
     }
     
     // returns a random rotation in 90 degree intervals: 0, 90, 270, 360
