@@ -1,12 +1,11 @@
 import SceneKit
 import UIKit
+import PlaygroundSupport
 import SpriteKit
 
 public class PlayArea: NSObject, UIGestureRecognizerDelegate {
     
-    static var v: SCNView!
-    
-    public let view: SCNView
+    public let view = SCNView(frame: CGRect(x: 0, y: 0, width: 800, height: 800))
     
     let scene = SCNScene()
     let camera = SCNCamera()
@@ -23,29 +22,25 @@ public class PlayArea: NSObject, UIGestureRecognizerDelegate {
     var defaultGestures: [UIGestureRecognizer]!
     
     public override init() {
-        self.view = PlayArea.v
         super.init()
         
         // setup view properties
         view.scene = scene
         view.backgroundColor = UIColor.black
+        PlaygroundPage.current.liveView = view
         
-        // store gestures to be applied later
         view.allowsCameraControl = true
         defaultGestures = view.gestureRecognizers!
-        // view.allowsCameraControl = false
+        view.allowsCameraControl = false
         
         // setup camera
         cameraNode.camera = camera
-        cameraNode.position = SCNVector3(x: 0, y: 0, z: 10)
+        cameraNode.position = SCNVector3(x: -4, y: 3, z: 10)
+        add(node: cameraNode)
         let look = SCNLookAtConstraint(target: centerNode)
         look.isGimbalLockEnabled = true
         cameraNode.constraints = [look]
-        add(node: cameraNode)
         
-        //view.defaultCameraController?.interactionMode = .orbitTurntable
-        // view.defaultCameraController?.maximumVerticalAngle = 45.0
-                
         // creates stars
         for color in UIColor.rubiksColors {
             let exp = SCNParticleSystem()
